@@ -1,5 +1,16 @@
 # Quick Start Guide
 
+## Prerequisites
+
+**⚠️ IMPORTANT: Start OpenCode server first!**
+
+```bash
+# Terminal 1 - Start and keep running:
+opencode serve
+```
+
+Regular `opencode` commands don't expose an HTTP server, so you need `opencode serve`.
+
 ## Installation (Local Development)
 
 ```bash
@@ -10,17 +21,28 @@ npm run build
 
 ## Usage
 
-### Using npx (Development)
+### Step 1: Ensure server is running
+```bash
+# Check if server is running:
+lsof -i :4096
+
+# If not, start it:
+opencode serve
+```
+
+### Step 2: Use the tool
+
+#### Using npx (Development)
 
 ```bash
 # In any directory
 npx ~/git/github/towc/opencode-plugin-resume "session-title"
 ```
 
-### Using the shell alias
+#### Using the shell alias
 
 ```bash
-# Reload shell
+# Reload shell (first time only)
 source ~/.zshrc
 
 # Use 'o' command
