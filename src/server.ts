@@ -56,14 +56,18 @@ function startServer(): void {
  * Ensure OpenCode server is running, starting it if necessary
  */
 export async function ensureServerRunning(): Promise<void> {
+  console.log('Checking if OpenCode server is running...')
   if (await isServerRunning()) {
+    console.log('Server is already running')
     return // Server already running
   }
   
+  console.log('Server not running, starting it...')
   // Start server
   startServer()
   
   // Wait for server to be ready
+  console.log('Waiting for server to be ready...')
   await waitForServer(5000)
   console.log('Server started successfully')
 }

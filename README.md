@@ -10,6 +10,19 @@ Resume or create OpenCode sessions by title. Never lose track of your project se
 2. **Resumes** the session if found, or **creates** a new one with the specified title
 3. **Normalizes** titles for flexible matching (case-insensitive, spaces/underscores → hyphens)
 
+## Prerequisites
+
+**OpenCode server must be running:**
+
+```bash
+# In a separate terminal, start and keep running:
+opencode serve
+```
+
+**Why?** OpenCode TUI instances (regular `opencode` command) use internal RPC and don't expose an HTTP server. The `opencode serve` command starts the HTTP server that this tool needs to communicate with.
+
+**Tip:** Add this to your startup script or run it in a tmux/screen session.
+
 ## Installation
 
 ### Local Development
@@ -37,7 +50,15 @@ npm install -g opencode-resume
 
 ## Usage
 
+**First, ensure the server is running:**
 ```bash
+# Terminal 1: Start server (keep running)
+opencode serve
+```
+
+**Then use the tool:**
+```bash
+# Terminal 2 (or use shell alias)
 opencode-resume "session-title"
 ```
 

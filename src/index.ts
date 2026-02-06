@@ -22,7 +22,17 @@ async function main() {
   
   try {
     // Ensure OpenCode server is running
-    await ensureServerRunning()
+    try {
+      await ensureServerRunning()
+    } catch (error) {
+      console.error('❌ Failed to start or connect to OpenCode server')
+      console.error('   Please start the server manually: opencode serve')
+      console.error('   Or run in another terminal and keep it running.')
+      if (error instanceof Error) {
+        console.error('   Error:', error.message)
+      }
+      process.exit(1)
+    }
     
     // Create SDK client
     const client = createOpencodeClient({
@@ -47,6 +57,10 @@ async function main() {
       
       if (!response.data?.id) {
         console.error('❌ Failed to create session')
+        if (response.error) {
+          console.error('   Error details:', response.error)
+        }
+        console.error('   Response:', JSON.stringify(response, null, 2))
         process.exit(1)
       }
       
