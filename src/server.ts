@@ -9,7 +9,11 @@ async function isServerRunning(): Promise<boolean> {
     const client = createOpencodeClient({ 
       baseUrl: 'http://localhost:4096',
     })
-    await client.session.list()
+    const response = await client.session.list()
+    // SDK may return error in response instead of throwing
+    if (response.error) {
+      return false
+    }
     return true
   } catch {
     return false
@@ -27,11 +31,14 @@ async function waitForServer(timeoutMs: number): Promise<void> {
   
   while (Date.now() - startTime < timeoutMs) {
     try {
-      await client.session.list()
-      return // Server is ready
+      const response = await client.session.list()
+      if (!response.error) {
+        return // Server is ready
+      }
     } catch {
-      await new Promise(resolve => setTimeout(resolve, 200))
+      // Connection failed, keep trying
     }
+    await new Promise(resolve => setTimeout(resolve, 200))
   }
   
   throw new Error('Server failed to start within timeout')
@@ -68,6 +75,6 @@ export async function ensureServerRunning(): Promise<void> {
   
   // Wait for server to be ready
   console.log('Waiting for server to be ready...')
-  await waitForServer(5000)
+  await waitForServer(10000)
   console.log('Server started successfully')
 }
