@@ -2,6 +2,16 @@ import { createOpencodeClient } from '@opencode-ai/sdk/v2'
 import type { Session } from '@opencode-ai/sdk/v2'
 
 /**
+ * Check if session is interactive (not a subagent)
+ */
+function isInteractiveSession(session: Session): boolean {
+  if (!session.permission) return true
+  return !session.permission.some(p => 
+    p.permission === 'todowrite' && p.action === 'deny'
+  )
+}
+
+/**
  * Normalize session title for comparison
  * - Convert to lowercase
  * - Replace spaces and underscores with hyphens
@@ -16,6 +26,7 @@ export function normalizeTitle(title: string): string {
  * Find existing session by title in the specified directory
  * Uses normalized title matching (case-insensitive, spaces/underscores → hyphens)
  * If multiple matches exist, returns the most recently updated one
+ * Excludes non-interactive subagent sessions
  */
 export async function findSession(
   title: string,
@@ -38,10 +49,11 @@ export async function findSession(
       return null
     }
     
-    // Find exact match (after normalization)
+    // Find exact match (after normalization), excluding subagents
     const matches = response.data.filter((s: Session) => 
       s.directory === directory &&
-      normalizeTitle(s.title) === normalized
+      normalizeTitle(s.title) === normalized &&
+      isInteractiveSession(s)
     )
     
     if (matches.length === 0) {
