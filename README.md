@@ -29,13 +29,18 @@ When run without arguments, shows an interactive TUI:
  /   type to search
 ↑↓ navigate | enter select | ^n new | esc quit
 
-> my-session          10:30 AM  abc123de
-  api-server          yesterday def456gh
-  database-work       3d ago    ghi789jk
+> my-session          14:30  let's update the keybinds...
+  api-server          yesterday  can you help me fix the...
+  database-work       3d ago  add migration for users...
 ```
 
+Each session shows:
+- **Title** - Session name (left-aligned)
+- **Timestamp** - When last updated (24hr format, or relative like "yesterday", "3d ago")
+- **Preview** - Last user message (truncated to fit terminal width)
+
 **Controls:**
-- **Type** - Fuzzy search sessions
+- **Type** - Fuzzy search sessions by title
 - **↑/↓** - Navigate list
 - **Enter** - Resume selected session
 - **Ctrl+N** - Create new session with search query as title
@@ -103,7 +108,7 @@ Titles are normalized before matching:
 
 - Only shows sessions in the current directory
 - Excludes non-interactive subagent sessions (spawned by Task tool)
-- Multiple sessions with same title are distinguished by timestamp and ID
+- Multiple sessions with same title are distinguished by timestamp and last message preview
 
 ### Server Management
 
