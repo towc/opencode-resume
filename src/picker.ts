@@ -7,6 +7,10 @@ export interface PickerResult {
   title?: string
 }
 
+export interface SessionWithPreview extends Session {
+  lastUserMessage?: string
+}
+
 function isInteractiveSession(session: Session): boolean {
   // Filter out non-interactive subagent sessions (they have restricted permissions)
   if (!session.permission) return true
@@ -32,15 +36,46 @@ function formatTimestamp(ms: number): string {
   }
 }
 
-function formatSession(session: Session, selected: boolean, maxTitleLen: number): string {
-  const cursor = selected ? '>' : ' '
-  const timestamp = formatTimestamp(session.time.updated)
-  const id = session.id.slice(-8)
-  const paddedTitle = session.title.padEnd(maxTitleLen)
-  return `${cursor} ${paddedTitle}  \x1b[2m${timestamp}  ${id}\x1b[0m`
+function getTerminalWidth(): number {
+  return process.stdout.columns || 80
 }
 
-export async function getSessions(directory: string): Promise<Session[]> {
+function truncateWithEllipsis(text: string, maxLen: number): string {
+  if (text.length <= maxLen) return text
+  if (maxLen <= 3) return text.slice(0, maxLen)
+  return text.slice(0, maxLen - 3) + '...'
+}
+
+function formatSession(session: SessionWithPreview, selected: boolean, maxTitleLen: number): string {
+  const cursor = selected ? '>' : ' '
+  const timestamp = formatTimestamp(session.time.updated)
+  const paddedTitle = session.title.padEnd(maxTitleLen)
+  
+  // Calculate available space for preview
+  // Format: "> title  timestamp  preview"
+  const termWidth = getTerminalWidth()
+  const fixedParts = cursor.length + 1 + maxTitleLen + 2 + timestamp.length + 2 // cursor + space + title + 2 spaces + timestamp + 2 spaces
+  const availableForPreview = termWidth - fixedParts - 2 // leave some margin
+  
+  let preview = ''
+  if (session.lastUserMessage && availableForPreview > 10) {
+    // Clean up the message (single line, no extra whitespace)
+    const cleaned = session.lastUserMessage.replace(/\s+/g, ' ').trim()
+    preview = truncateWithEllipsis(cleaned, availableForPreview)
+  }
+  
+  if (preview) {
+    return `${cursor} ${paddedTitle}  \x1b[2m${timestamp}  ${preview}\x1b[0m`
+  }
+  return `${cursor} ${paddedTitle}  \x1b[2m${timestamp}\x1b[0m`
+}
+
+interface MessageWithParts {
+  info: { id: string; role: string }
+  parts: Array<{ type: string; text?: string }>
+}
+
+export async function getSessions(directory: string): Promise<SessionWithPreview[]> {
   const client = createOpencodeClient({
     baseUrl: 'http://localhost:4096'
   })
@@ -53,9 +88,42 @@ export async function getSessions(directory: string): Promise<Session[]> {
   if (!response.data) return []
   
   // Filter to current directory, exclude subagents, and sort by most recent
-  return response.data
+  const sessions = response.data
     .filter((s: Session) => s.directory === directory && isInteractiveSession(s))
     .sort((a, b) => b.time.updated - a.time.updated)
+  
+  // Fetch last user message for each session (in parallel, limited)
+  const sessionsWithPreviews: SessionWithPreview[] = await Promise.all(
+    sessions.slice(0, 20).map(async (session): Promise<SessionWithPreview> => {
+      try {
+        const messagesRes = await client.session.messages({
+          sessionID: session.id,
+          directory,
+          limit: 10
+        })
+        
+        if (messagesRes.data) {
+          // Response is array of { info, parts } - find last user message
+          const messages = messagesRes.data as MessageWithParts[]
+          for (const msg of messages) {
+            if (msg.info.role === 'user') {
+              // Find first text part
+              const textPart = msg.parts.find(p => p.type === 'text' && p.text)
+              if (textPart?.text) {
+                return { ...session, lastUserMessage: textPart.text }
+              }
+            }
+          }
+        }
+      } catch {
+        // Ignore errors fetching messages
+      }
+      return session
+    })
+  )
+  
+  // Add remaining sessions without previews
+  return [...sessionsWithPreviews, ...sessions.slice(20)]
 }
 
 function fuzzyMatch(query: string, text: string): boolean {
