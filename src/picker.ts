@@ -22,7 +22,7 @@ function formatTimestamp(ms: number): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
   
   if (diffDays === 0) {
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
   } else if (diffDays === 1) {
     return 'yesterday'
   } else if (diffDays < 7) {
