@@ -87,9 +87,9 @@ export async function getSessions(directory: string): Promise<SessionWithPreview
   
   if (!response.data) return []
   
-  // Filter to current directory, exclude subagents, and sort by most recent
+  // Filter to current directory, exclude subagents and empty sessions, and sort by most recent
   const sessions = response.data
-    .filter((s: Session) => s.directory === directory && isInteractiveSession(s))
+    .filter((s: Session) => s.directory === directory && isInteractiveSession(s) && s.time.created !== s.time.updated)
     .sort((a, b) => b.time.updated - a.time.updated)
   
   // Fetch last user message for each session (in parallel, limited)
@@ -252,7 +252,7 @@ export async function showPicker(directory: string): Promise<PickerResult> {
     
     if (filtered.length === 0) {
       if (query) {
-        lines.push(`  \x1b[33mNo matches. Press ^n to create "${query}"\x1b[0m`)
+        lines.push(`  \x1b[33mNo matches. Press ^n or enter to create "${query}"\x1b[0m`)
       } else {
         lines.push('  \x1b[2mNo sessions\x1b[0m')
       }

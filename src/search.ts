@@ -12,6 +12,14 @@ function isInteractiveSession(session: Session): boolean {
 }
 
 /**
+ * Check if session has any activity (messages, edits, etc.)
+ * Sessions where created == updated have never been used
+ */
+function hasActivity(session: Session): boolean {
+  return session.time.created !== session.time.updated
+}
+
+/**
  * Normalize session title for comparison
  * - Convert to lowercase
  * - Replace spaces and underscores with hyphens
@@ -49,11 +57,12 @@ export async function findSession(
       return null
     }
     
-    // Find exact match (after normalization), excluding subagents
+    // Find exact match (after normalization), excluding subagents and empty sessions
     const matches = response.data.filter((s: Session) => 
       s.directory === directory &&
       normalizeTitle(s.title) === normalized &&
-      isInteractiveSession(s)
+      isInteractiveSession(s) &&
+      hasActivity(s)
     )
     
     if (matches.length === 0) {
