@@ -6,7 +6,10 @@
 # Run basic smoke tests
 ./test-basic.sh
 
-# Test with npx (recommended for development)
+# Test with built binary
+node dist/index.js "test-session"
+
+# Or use npx (slower, but no install needed)
 npx . "test-session"
 ```
 
@@ -18,12 +21,12 @@ npx . "test-session"
 cd ~/some-test-directory
 
 # First run - creates new session
-npx ~/git/github/towc/opencode-plugin-resume "test-session"
+opencode-resume "test-session"
 # Expected: Creates session with title "test-session"
 # Action: Exit OpenCode (Ctrl+C or quit)
 
 # Second run - resumes session
-npx ~/git/github/towc/opencode-plugin-resume "test-session"
+opencode-resume "test-session"
 # Expected: Resumes the same session
 ```
 
@@ -31,10 +34,10 @@ npx ~/git/github/towc/opencode-plugin-resume "test-session"
 
 ```bash
 # All these should resume the same session:
-npx ~/git/github/towc/opencode-plugin-resume "test session"
-npx ~/git/github/towc/opencode-plugin-resume "test_session"
-npx ~/git/github/towc/opencode-plugin-resume "TEST_SESSION"
-npx ~/git/github/towc/opencode-plugin-resume "Test Session"
+opencode-resume "test session"
+opencode-resume "test_session"
+opencode-resume "TEST_SESSION"
+opencode-resume "Test Session"
 ```
 
 ### 3. Using the Shell Alias
@@ -57,12 +60,12 @@ o "database-migrations"
 pkill -f "opencode serve"
 
 # Run opencode-resume
-npx ~/git/github/towc/opencode-plugin-resume "test"
+opencode-resume "test"
 # Expected: Starts server automatically, then creates/resumes session
 
 # Test 2: Server already running
 # Server should stay running from previous test
-npx ~/git/github/towc/opencode-plugin-resume "test"
+opencode-resume "test"
 # Expected: Reuses existing server
 ```
 
@@ -90,7 +93,7 @@ o "project-b-session"  # Should resume project-b session
 
 ```bash
 # No title provided
-npx ~/git/github/towc/opencode-plugin-resume
+opencode-resume
 # Expected: Shows usage message
 
 # Invalid directory
@@ -196,10 +199,8 @@ ls -la ~/.local/share/opencode/storage/session/
 - List sessions: `opencode session list`
 - Remember: Title matching is normalized (case-insensitive, spaces/underscores → hyphens)
 
-### npx is slow
-- First run downloads packages (slow)
-- Subsequent runs use cache (fast)
-- For best performance, use `npm link` for global installation
+### CLI is slow
+- `npx` adds ~800ms of startup overhead — fine for testing, but for daily use prefer a direct `node` alias or `npm i -g`
 
 ## CI/CD Testing (Future)
 

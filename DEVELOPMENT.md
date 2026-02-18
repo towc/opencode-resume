@@ -3,7 +3,7 @@
 ## Project Structure
 
 ```
-opencode-plugin-resume/
+opencode-resume/
 ├── src/
 │   ├── index.ts       # Main CLI entry point
 │   ├── server.ts      # Server management (ensure running, wait for ready)
@@ -23,7 +23,7 @@ opencode-plugin-resume/
 ### Setup
 
 ```bash
-cd ~/git/github/towc/opencode-plugin-resume
+cd /path/to/opencode-resume
 npm install
 ```
 
@@ -43,7 +43,7 @@ npm run dev
 # After building, test directly
 node dist/index.js "test-session"
 
-# Or use npx with current directory
+# Or use npx (slower, but no install needed)
 npx . "test-session"
 
 # Or test the smoke tests
@@ -54,7 +54,7 @@ npx . "test-session"
 
 1. Edit files in `src/`
 2. Run `npm run build` (or use watch mode)
-3. Test with `npx . "test-title"`
+3. Test with `node dist/index.js "test-title"` or `npx . "test-title"`
 4. Commit when ready
 
 ## Code Organization

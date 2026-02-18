@@ -14,7 +14,7 @@ Regular `opencode` commands don't expose an HTTP server, so you need `opencode s
 ## Installation (Local Development)
 
 ```bash
-cd ~/git/github/towc/opencode-plugin-resume
+cd /path/to/opencode-resume
 npm install
 npm run build
 ```
@@ -31,13 +31,6 @@ opencode serve
 ```
 
 ### Step 2: Use the tool
-
-#### Using npx (Development)
-
-```bash
-# In any directory
-npx ~/git/github/towc/opencode-plugin-resume "session-title"
-```
 
 #### Using the shell alias
 
@@ -90,17 +83,14 @@ cd ~/project-b && o "api-server"  # Session B (different)
 ## Testing
 
 ```bash
-cd ~/git/github/towc/opencode-plugin-resume
+cd /path/to/opencode-resume
 ./test-basic.sh
 ```
 
 ## Help
 
 ```bash
-# Show usage
-npx ~/git/github/towc/opencode-plugin-resume
-
-# Or with alias
+# Show interactive picker
 o
 ```
 
@@ -143,9 +133,12 @@ pwd                    # Check you're in right directory
 opencode session list  # View all sessions
 ```
 
-**npx is slow**
+**CLI is slow**
 ```bash
-npm link  # Install globally for faster access
+# npx adds ~800ms overhead — for daily use, prefer a direct alias or global install:
+alias o='node /path/to/opencode-resume/dist/index.js'
+# Or:
+npm i -g /path/to/opencode-resume
 ```
 
 ## Next Steps

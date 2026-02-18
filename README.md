@@ -56,20 +56,40 @@ opencode serve
 
 ## Installation
 
+### Global Install (Recommended)
+
+```bash
+npm i -g /path/to/opencode-resume
+```
+
+Then add a shell alias to your `.zshrc` or `.bashrc`:
+
+```bash
+alias o='opencode-resume'
+```
+
+### Shell Alias (Direct)
+
+If you prefer not to install globally, point directly at the built file:
+
+```bash
+alias o='node /path/to/opencode-resume/dist/index.js'
+```
+
+### Try Without Installing
+
+```bash
+npx /path/to/opencode-resume "my-session"
+```
+
+> **Note:** `npx` adds ~800ms of startup overhead. Fine for trying it out, but use one of the above for daily use.
+
 ### Local Development
 
 ```bash
-cd ~/git/github/towc/opencode-plugin-resume
+cd /path/to/opencode-resume
 npm install
 npm run build
-```
-
-### Shell Alias (Recommended)
-
-Add to your `.zshrc` or `.bashrc`:
-
-```bash
-alias o='npx ~/git/github/towc/opencode-plugin-resume'
 ```
 
 ## Usage Examples
@@ -140,20 +160,18 @@ npm run dev
 ### Testing Locally
 
 ```bash
-# Using npx with relative path
 cd ~/some-test-project
-npx ~/git/github/towc/opencode-plugin-resume "test-session"
+opencode-resume "test-session"
 
 # Or using the built binary directly
-cd ~/git/github/towc/opencode-plugin-resume
-./dist/index.js "test-session"
+node /path/to/opencode-resume/dist/index.js "test-session"
 ```
 
 ## Architecture
 
-### Not a Plugin
+### Standalone CLI
 
-Despite the repository name, this is **not** an OpenCode plugin. It's a standalone CLI tool that uses the OpenCode SDK to:
+This is a standalone CLI tool (not an OpenCode plugin) that uses the OpenCode SDK to:
 - Search for existing sessions
 - Create new sessions with custom titles
 - Launch OpenCode with specific sessions
